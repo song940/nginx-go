@@ -30,14 +30,15 @@ func (b Block) GetServers() (block Block) {
 	return
 }
 
-func (b Block) GetServerName() string {
+func (b Block) GetServerNames() (domains []string) {
 	for _, item := range b.Items {
-		directive := item.(*Directive)
-		if directive.Name == "server_name" {
-			return directive.Value
+		if directive, ok := item.(*Directive); ok {
+			if directive.Name == "server_name" {
+				domains = append(domains, directive.Value)
+			}
 		}
 	}
-	return ""
+	return
 }
 
 // Directive represents a directive in the Nginx configuration.

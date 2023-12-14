@@ -1,24 +1,37 @@
 package main
 
 import (
-	"fmt"
 	"log"
 	"os"
+	"path/filepath"
+	"strings"
 
 	"github.com/song940/nginx-go/nginx"
 )
 
 func main() {
-	filePath := "/Users/Lsong/Projects/confbook/nginx/nginx.conf"
-	file, err := os.Open(filePath)
-	if err != nil {
-		fmt.Println("Error opening file:", err)
-		return
-	}
-	defer file.Close()
+	// filePath := "/Users/Lsong/Projects/confbook/nginx/nginx.conf"
+	var nginxConfigPath = "/Users/Lsong/Projects/confbook/nginx/sites-available"
 
-	nginxConfig := nginx.ParseNginxConfig(file)
-	printNginxConfig(nginxConfig)
+	files, _ := os.ReadDir(nginxConfigPath)
+	for _, file := range files {
+		if !strings.HasSuffix(file.Name(), ".conf") {
+			continue
+		}
+		fullpath := filepath.Join(nginxConfigPath, file.Name())
+		f, _ := os.Open(fullpath)
+		items := nginx.ParseNginxConfig(f)
+		log.Println(items[0].(*nginx.Block).GetServerNames())
+	}
+	// file, err := os.Open(filePath)
+	// if err != nil {
+	// 	fmt.Println("Error opening file:", err)
+	// 	return
+	// }
+	// defer file.Close()
+
+	// nginxConfig := nginx.ParseNginxConfig(file)
+	// printNginxConfig(nginxConfig)
 }
 
 func printNginxConfig(items []nginx.Items) {
